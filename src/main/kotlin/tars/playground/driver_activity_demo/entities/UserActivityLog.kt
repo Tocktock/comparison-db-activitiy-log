@@ -57,4 +57,11 @@ data class UserActivityEvent(
 
 // make repository
 @Repository
-interface EventRepository : MongoRepository<UserActivityEvent, String>
+interface UserActivityEventRepository : MongoRepository<UserActivityEvent, String> {
+    fun findByUserId(userId: String): List<UserActivityEvent>
+    fun findByUserIdAndCreatedAtBetween(userId: String, start: LocalDateTime, end: LocalDateTime): List<UserActivityEvent>
+    fun findByUserIdAndEntityType(userId: String, entityType: String): List<UserActivityEvent>
+    fun findByUserIdAndEntityTypeAndCreatedAtBetween(userId: String, entityType: String, start: LocalDateTime, end: LocalDateTime): List<UserActivityEvent>
+    fun findByUserIdAndEntityTypeAndEventType(userId: String, entityType: String, eventType: String): List<UserActivityEvent>
+    fun findByUserIdAndEntityTypeAndEventTypeAndCreatedAtBetween(userId: String, entityType: String, eventType: String, start: LocalDateTime, end: LocalDateTime): List<UserActivityEvent>
+}
