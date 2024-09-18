@@ -1,6 +1,11 @@
 spring:
   data:
     mongodb:
-      username: admin
-      password: adminpassword
-      uri: mongodb://localhost:27017/mydatabase
+      host: localhost
+      port: 27017
+      database: user_activity_log
+      username: myUser
+      password: myPassword
+  threads:
+    virtual:
+      enabled: true
