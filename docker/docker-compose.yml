@@ -1,0 +1,53 @@
+version: '3'
+services:
+  cassandra-seed:
+    image: cassandra:latest
+    container_name: cassandra-seed
+    environment:
+      CASSANDRA_CLUSTER_NAME: "Test Cluster"
+      CASSANDRA_SEEDS: "cassandra-seed"
+      CASSANDRA_BROADCAST_ADDRESS: cassandra-seed
+    networks:
+      cassandra-net:
+        aliases:
+          - cassandra-seed
+    ports:
+      - "9042:9042"  # Expose the CQL port for Cassandra Seed Node
+    volumes:
+      - ./data/cassandra-seed:/var/lib/cassandra  # Persist data
+
+  cassandra-node1:
+    image: cassandra:latest
+    container_name: cassandra-node1
+    environment:
+      CASSANDRA_CLUSTER_NAME: "Test Cluster"
+      CASSANDRA_SEEDS: "cassandra-seed"
+      CASSANDRA_BROADCAST_ADDRESS: cassandra-node1
+    networks:
+      cassandra-net:
+        aliases:
+          - cassandra-node1
+    depends_on:
+      - cassandra-seed
+    volumes:
+      - ./data/cassandra-node1:/var/lib/cassandra  # Persist data
+
+  cassandra-node2:
+    image: cassandra:latest
+    container_name: cassandra-node2
+    environment:
+      CASSANDRA_CLUSTER_NAME: "Test Cluster"
+      CASSANDRA_SEEDS: "cassandra-seed"
+      CASSANDRA_BROADCAST_ADDRESS: cassandra-node2
+    networks:
+      cassandra-net:
+        aliases:
+          - cassandra-node2
+    depends_on:
+      - cassandra-seed
+    volumes:
+      - ./data/cassandra-node2:/var/lib/cassandra  # Persist data
+
+networks:
+  cassandra-net:
+    driver: bridge
