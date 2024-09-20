@@ -1,12 +1,16 @@
 package tars.playground.driver_activity_demo
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RestController
+import tars.playground.driver_activity_demo.entity.UserActivityEvent
+import tars.playground.driver_activity_demo.entity.UserActivityEventRepository
 import kotlin.random.Random
 
 @RestController
 class UserActivityLogController(
-    private val userActivityEventRepository: UserActivityEventRepository
+    private val userActivityEventRepository: UserActivityEventRepository,
+    private val objectMapper: ObjectMapper
 ) {
 
     @PostMapping("/user-activity-log/insert")
@@ -23,11 +27,16 @@ class UserActivityLogController(
             },
             description = "description",
             metadata = getRandomMetadata(),
-            location = UserActivityEvent.Location(coordinates = listOf(1.0, 2.0)),
-            ipAddress =  "${Random.nextInt(0, 256)}.${Random.nextInt(0, 256)}.${Random.nextInt(0, 256)}.${Random.nextInt(0, 256)}",
-            deviceInfo = UserActivityEvent.DeviceInfo(deviceType = UserActivityEvent.DeviceInfo.DeviceType.entries.let {
+            coordinates = listOf(1.0, 2.0),
+            ipAddress = "${Random.nextInt(0, 256)}.${Random.nextInt(0, 256)}.${Random.nextInt(0, 256)}.${
+                Random.nextInt(
+                    0,
+                    256
+                )
+            }",
+            deviceInfo = objectMapper.writeValueAsString(UserActivityEvent.DeviceInfo(deviceType = UserActivityEvent.DeviceInfo.DeviceType.entries.let {
                 it.elementAt(Random.nextInt(it.size))
-            }, os = "os"),
+            }, os = "os")),
             userRole = "user-role"
         )
 
@@ -35,7 +44,7 @@ class UserActivityLogController(
     }
 
 
-    fun getRandomMetadata(): Map<String, Any> {
+    fun getRandomMetadata(): String {
         // Template 1: User Activity Metadata
         val template1 = mapOf(
             "browser" to getRandomBrowser(),
@@ -81,7 +90,10 @@ class UserActivityLogController(
         val templates = listOf(template1, template2, template3, template4, template5)
 
         // Randomly pick one of the templates
-        return templates[Random.nextInt(templates.size)]
+        val selectedTemplate = templates[Random.nextInt(templates.size)]
+
+        // Serialize the selected template to a JSON string
+        return objectMapper.writeValueAsString(selectedTemplate)
     }
 
 // Helper functions to generate random values for metadata fields

@@ -1,53 +1,56 @@
-version: '3'
+version: '3.8'
 services:
-  cassandra-seed:
+  cassandra-1:
     image: cassandra:latest
-    container_name: cassandra-seed
+    container_name: cassandra-1
     environment:
       CASSANDRA_CLUSTER_NAME: "Test Cluster"
-      CASSANDRA_SEEDS: "cassandra-seed"
-      CASSANDRA_BROADCAST_ADDRESS: cassandra-seed
-    networks:
-      cassandra-net:
-        aliases:
-          - cassandra-seed
+      CASSANDRA_SEEDS: "cassandra-1"   # Seed node should be the first node
+      CASSANDRA_BROADCAST_ADDRESS: cassandra-1
+      CASSANDRA_ENDPOINT_SNITCH: GossipingPropertyFileSnitch
     ports:
-      - "9042:9042"  # Expose the CQL port for Cassandra Seed Node
+      - "9042:9042"  # Expose port for external connections
     volumes:
-      - ./data/cassandra-seed:/var/lib/cassandra  # Persist data
+      - ./data/cassandra1:/var/lib/cassandra   # Persist data for cassandra-1
+    networks:
+      cassandra_net:
+        ipv4_address: 172.20.0.2
 
-  cassandra-node1:
+  cassandra-2:
     image: cassandra:latest
-    container_name: cassandra-node1
+    container_name: cassandra-2
     environment:
       CASSANDRA_CLUSTER_NAME: "Test Cluster"
-      CASSANDRA_SEEDS: "cassandra-seed"
-      CASSANDRA_BROADCAST_ADDRESS: cassandra-node1
-    networks:
-      cassandra-net:
-        aliases:
-          - cassandra-node1
-    depends_on:
-      - cassandra-seed
+      CASSANDRA_SEEDS: "cassandra-1"   # All nodes point to cassandra-1 as seed
+      CASSANDRA_BROADCAST_ADDRESS: cassandra-2
+      CASSANDRA_ENDPOINT_SNITCH: GossipingPropertyFileSnitch
+    ports:
+      - "9043:9042"  # Expose port for external connections
     volumes:
-      - ./data/cassandra-node1:/var/lib/cassandra  # Persist data
+      - ./data/cassandra2:/var/lib/cassandra   # Persist data for cassandra-2
+    networks:
+      cassandra_net:
+        ipv4_address: 172.20.0.3
 
-  cassandra-node2:
+  cassandra-3:
     image: cassandra:latest
-    container_name: cassandra-node2
+    container_name: cassandra-3
     environment:
       CASSANDRA_CLUSTER_NAME: "Test Cluster"
-      CASSANDRA_SEEDS: "cassandra-seed"
-      CASSANDRA_BROADCAST_ADDRESS: cassandra-node2
-    networks:
-      cassandra-net:
-        aliases:
-          - cassandra-node2
-    depends_on:
-      - cassandra-seed
+      CASSANDRA_SEEDS: "cassandra-1"   # All nodes point to cassandra-1 as seed
+      CASSANDRA_BROADCAST_ADDRESS: cassandra-3
+      CASSANDRA_ENDPOINT_SNITCH: GossipingPropertyFileSnitch
+    ports:
+      - "9044:9042"  # Expose port for external connections
     volumes:
-      - ./data/cassandra-node2:/var/lib/cassandra  # Persist data
+      - ./data/cassandra3:/var/lib/cassandra   # Persist data for cassandra-3
+    networks:
+      cassandra_net:
+        ipv4_address: 172.20.0.4
 
 networks:
-  cassandra-net:
+  cassandra_net:
     driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

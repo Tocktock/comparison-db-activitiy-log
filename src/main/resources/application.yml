@@ -1,11 +1,6 @@
 spring:
-  data:
-    mongodb:
-      host: localhost
-      port: 27017
-      database: user_activity_log
-      username: myUser
-      password: myPassword
-  threads:
-    virtual:
-      enabled: true
+  cassandra:
+    contact-points: localhost:9042, localhost:9043, localhost:9044
+    schema-action: CREATE_IF_NOT_EXISTS
+    local-datacenter: dc1
+    keyspace-name: my_keyspace
