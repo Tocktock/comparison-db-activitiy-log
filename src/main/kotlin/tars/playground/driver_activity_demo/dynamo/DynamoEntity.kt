@@ -1,5 +1,6 @@
 package tars.playground.driver_activity_demo.dynamo
 
+import org.springframework.context.annotation.Profile
 import software.amazon.awssdk.enhanced.dynamodb.AttributeConverter
 import software.amazon.awssdk.enhanced.dynamodb.AttributeValueType
 import software.amazon.awssdk.enhanced.dynamodb.EnhancedType
@@ -14,6 +15,7 @@ import java.time.LocalDateTime
 
 
 @DynamoDbBean
+@Profile("dynamo")
 data class TruckerActivityEventDynamoEntity(
     @get:DynamoDbPartitionKey
     var id: String? = null,

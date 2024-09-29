@@ -1,5 +1,6 @@
 package tars.playground.driver_activity_demo.dynamo
 
+import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Repository
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
@@ -11,6 +12,7 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbParti
 import software.amazon.awssdk.services.dynamodb.model.ResourceNotFoundException
 
 @RestController
+@Profile("dynamo")
 class TruckerActivityEventDynamoRepositoryTest(
     private val dynamoDbEnhancedClient: DynamoDbEnhancedClient
 ) {
@@ -37,6 +39,7 @@ class TruckerActivityEventDynamoRepositoryTest(
 }
 
 @DynamoDbBean
+@Profile("dynamo")
 data class User(
     @get:DynamoDbPartitionKey
     var id: String? = null,
@@ -46,6 +49,7 @@ data class User(
 
 
 @Repository
+@Profile("dynamo")
 class TruckerActivityEventDynamoRepository(
     private val dynamoDbEnhancedClient: DynamoDbEnhancedClient
 ) {
@@ -89,5 +93,32 @@ class TruckerActivityEventDynamoRepository(
 
     fun getAll(): List<Any> {
         return table.scan().items().toList()
+    }
+}
+
+// create controller to test repository
+@RestController
+@Profile("dynamo")
+class TruckerActivityEventController(
+    private val repository: TruckerActivityEventDynamoRepository
+) {
+
+    @GetMapping("/events")
+    fun getAllEvents(): List<Any> {
+        return repository.getAll()
+    }
+
+    // save
+    @GetMapping("/save")
+    fun saveEvent(): String {
+        val event = TruckerActivityEvent.create(
+            userId = 1,
+            eventType = TruckerActivityEvent.EventType.DRIVER_LOCATION,
+            description = "Driver location updated",
+            metadata = mapOf("latitude" to 37.1234, "longitude" to 127.5678),
+            ipAddress = ""
+        )
+        repository.save(event)
+        return "Event saved"
     }
 }

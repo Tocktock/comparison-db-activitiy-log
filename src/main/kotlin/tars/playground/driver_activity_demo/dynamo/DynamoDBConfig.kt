@@ -14,6 +14,7 @@ import software.amazon.awssdk.services.dynamodb.DynamoDbClient
 import java.net.URI
 
 @Configuration
+@Profile("dynamo")
 class DynamoDbConfig(
     @Value("\${DYNAMO_URI:}") private val dynamoDbEndpoint: String
 ) {

@@ -9,3 +9,11 @@ spring:
   threads:
     virtual:
       enabled: true
+logging:
+  level:
+    org:
+      springframework:
+        web: DEBUG
+      apache:
+        http: DEBUG
+        http.wire: DEBUG
